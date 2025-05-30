@@ -1,0 +1,59 @@
+/* Aquí puedes cambiar el estilo de tu plugin Woo Stock Notifier */
+
+
+body {
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+    color: #0073aa;
+}
+
+
+a {
+    color: #0073aa;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+
+button, .button {
+    background-color: #0073aa;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+button:hover, .button:hover {
+    background-color: #005177;
+}
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+th {
+    background-color: #0073aa;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
