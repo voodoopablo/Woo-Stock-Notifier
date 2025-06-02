@@ -1,38 +1,7 @@
-=== Stock Notifier ===
-Contributors: voodoopablo
-Tags: woocommerce, stock, notification, email, out of stock
-Requires at least: 5.0
-Tested up to: 6.8
-Stable tag: 1.0
-Requires PHP: 7.2
-License: GPLv2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-A simple plugin to let customers subscribe to out-of-stock WooCommerce products and get notified by email when they are back in stock.
+# Stock Notifier
 
-== Description ==
-Stock Notifier for WooCommerce allows customers to subscribe to out-of-stock products and receive an email notification when the product is back in stock. Admins can manage and export subscribers from the WordPress dashboard.
-
-== Installation ==
-1. Upload the plugin files to the `/wp-content/plugins/stock-notifier/` directory, or install the plugin through the WordPress plugins screen directly.
-2. Activate the plugin through the 'Plugins' screen in WordPress.
-3. Make sure WooCommerce is installed and active.
-
-== Frequently Asked Questions ==
-= Can I customize the notification email? =
-Not yet, but this feature is planned for a future release.
-
-== Changelog ==
-= 1.0 =
-* Initial release.
-
-== Upgrade Notice ==
-= 1.0 =
-First public release.
-
-# Woo Stock Notifier
-
-Woo Stock Notifier is a WordPress plugin for WooCommerce that allows customers to subscribe to out-of-stock products and receive an email notification when the product is back in stock.
+Stock Notifier is a WordPress plugin for WooCommerce that allows customers to subscribe to out-of-stock products and receive an email notification when the product is back in stock.
 
 ## Features
 - Adds a subscription form to out-of-stock WooCommerce products.
