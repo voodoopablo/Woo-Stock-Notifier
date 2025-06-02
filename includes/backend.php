@@ -9,18 +9,19 @@ function wsn_admin_menu() {
 
 function wsn_admin_page() {
     // Guardar configuración general
-    if (isset($_POST['wsn_enabled'])) {
-        update_option('wsn_enabled', $_POST['wsn_enabled']);
-        echo '<div class="updated"><p>Configuración guardada.</p></div>';
+    if (isset($_POST['wsn_enabled']) && isset($_POST['wsn_general_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['wsn_general_nonce'])), 'wsn_save_general')) {
+        $enabled = sanitize_text_field(wp_unslash($_POST['wsn_enabled']));
+        update_option('wsn_enabled', $enabled);
+        echo '<div class="updated"><p>Settings saved.</p></div>';
     }
     // Guardar textos personalizados
-    if (isset($_POST['wsn_texts_nonce']) && wp_verify_nonce($_POST['wsn_texts_nonce'], 'wsn_save_texts')) {
-        update_option('wsn_frontend_text_title', sanitize_text_field($_POST['wsn_frontend_text_title']));
-        update_option('wsn_frontend_text_placeholder', sanitize_text_field($_POST['wsn_frontend_text_placeholder']));
-        update_option('wsn_frontend_text_button', sanitize_text_field($_POST['wsn_frontend_text_button']));
-        update_option('wsn_frontend_text_success', sanitize_text_field($_POST['wsn_frontend_text_success']));
-        update_option('wsn_frontend_text_error', sanitize_text_field($_POST['wsn_frontend_text_error']));
-        echo '<div class="updated"><p>Textos guardados.</p></div>';
+    if (isset($_POST['wsn_texts_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['wsn_texts_nonce'])), 'wsn_save_texts')) {
+        if (isset($_POST['wsn_frontend_text_title'])) update_option('wsn_frontend_text_title', sanitize_text_field(wp_unslash($_POST['wsn_frontend_text_title'])));
+        if (isset($_POST['wsn_frontend_text_placeholder'])) update_option('wsn_frontend_text_placeholder', sanitize_text_field(wp_unslash($_POST['wsn_frontend_text_placeholder'])));
+        if (isset($_POST['wsn_frontend_text_button'])) update_option('wsn_frontend_text_button', sanitize_text_field(wp_unslash($_POST['wsn_frontend_text_button'])));
+        if (isset($_POST['wsn_frontend_text_success'])) update_option('wsn_frontend_text_success', sanitize_text_field(wp_unslash($_POST['wsn_frontend_text_success'])));
+        if (isset($_POST['wsn_frontend_text_error'])) update_option('wsn_frontend_text_error', sanitize_text_field(wp_unslash($_POST['wsn_frontend_text_error'])));
+        echo '<div class="updated"><p>Texts saved.</p></div>';
     }
 
     $enabled = wsn_is_enabled();
@@ -38,17 +39,18 @@ function wsn_admin_page() {
         <a href="#wsn-tab-suscripciones" class="nav-tab" onclick="wsnShowTab(event, \'wsn-tab-suscripciones\')">Subscriptions</a>
     </h2>';
     echo '<div id="wsn-tab-ajustes" class="wsn-tab-content" style="display:block;">';
-    echo '<form method="post">
-            <table class="form-table">
-                <tr><th scope="row">Enable notification system</th>
-                    <td><select name="wsn_enabled">
-                        <option value="yes"' . selected($enabled, true, false) . '>Yes</option>
-                        <option value="no"' . selected($enabled, false, false) . '>No</option>
-                    </select></td>
-                </tr>
-            </table>
-            <p><input type="submit" class="button-primary" value="Save changes"></p>
-        </form>';
+    echo '<form method="post">'
+        . wp_nonce_field('wsn_save_general', 'wsn_general_nonce', true, false) . '
+        <table class="form-table">
+            <tr><th scope="row">Enable notification system</th>
+                <td><select name="wsn_enabled">
+                    <option value="yes"' . selected($enabled, true, false) . '>Yes</option>
+                    <option value="no"' . selected($enabled, false, false) . '>No</option>
+                </select></td>
+            </tr>
+        </table>
+        <p><input type="submit" class="button-primary" value="Save changes"></p>
+    </form>';
     echo '</div>';
     echo '<div id="wsn-tab-textos" class="wsn-tab-content" style="display:none;">';
     echo '<form method="post">
@@ -81,7 +83,7 @@ function wsn_admin_page() {
     // Nueva pestaña de suscripciones
     echo '<div id="wsn-tab-suscripciones" class="wsn-tab-content" style="display:none;">';
     // Procesar eliminación de suscripciones desde esta pestaña
-    if (isset($_POST['wsn_clear_emails']) && isset($_POST['product_id'])) {
+    if (isset($_POST['wsn_clear_emails']) && isset($_POST['product_id']) && isset($_POST['wsn_subs_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['wsn_subs_nonce'])), 'wsn_save_subs')) {
         delete_post_meta(intval($_POST['product_id']), '_wsn_emails');
         delete_post_meta(intval($_POST['product_id']), '_wsn_timestamps');
         delete_post_meta(intval($_POST['product_id']), '_wsn_sent');
@@ -99,7 +101,7 @@ function wsn_admin_page() {
         $sent = get_post_meta($product->ID, '_wsn_sent', true);
         $sent = is_array($sent) ? $sent : [];
         if ($emails && is_array($emails) && count($emails) > 0) {
-            echo '<tr><td><a href="' . get_edit_post_link($product->ID) . '">' . esc_html($product->post_title) . '</a></td><td>';
+            echo '<tr><td><a href="' . esc_url(get_edit_post_link($product->ID)) . '">' . esc_html($product->post_title) . '</a></td><td>';
             foreach ($emails as $email) {
                 echo esc_html($email) . '<br>';
             }
@@ -110,14 +112,15 @@ function wsn_admin_page() {
             echo '</td><td>';
             foreach ($emails as $email) {
                 if (isset($sent[$email])) {
-                    echo '<span style="color:green;">Sent (' . esc_html($sent[$email]) . ')</span><br>';
+                    echo '<span style="color:green;">' . esc_html__('Sent', 'woo-stock-notifier') . ' (' . esc_html($sent[$email]) . ')</span><br>';
                 } else {
-                    echo '<span style="color:orange;">Pending</span><br>';
+                    echo '<span style="color:orange;">' . esc_html__('Pending', 'woo-stock-notifier') . '</span><br>';
                 }
             }
             echo '</td><td>';
             echo '<form method="post" action="">';
-            echo '<input type="hidden" name="product_id" value="' . $product->ID . '">';
+            echo wp_nonce_field('wsn_save_subs', 'wsn_subs_nonce', true, false);
+            echo '<input type="hidden" name="product_id" value="' . esc_attr($product->ID) . '">';
             echo '<input type="submit" name="wsn_clear_emails" class="button" value="Delete">';
             echo '</form>';
             echo '</td></tr>';
